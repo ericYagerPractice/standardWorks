@@ -1,18 +1,12 @@
 /* src/App.js */
-import React, { useEffect, useState } from 'react'
-import Amplify, { API, graphqlOperation } from 'aws-amplify'
-import { createTodo } from './graphql/mutations'
-import { listTodos } from './graphql/queries'
-
-import awsExports from "./aws-exports";
-import { withAuthenticator } from '@aws-amplify/ui-react'
-
-
-Amplify.configure(awsExports);
+import React, { useEffect, useState } from 'react';
+import { API, graphqlOperation } from 'aws-amplify';
+import { createTodo } from '../graphql/mutations';
+import { listTodos } from '../graphql/queries';
 
 const initialState = { name: '', description: '', anotherOne: '' }
 
-const App = () => {
+const APIcomponent = () => {
   const [formState, setFormState] = useState(initialState)
   const [todos, setTodos] = useState([])
 
@@ -45,7 +39,7 @@ const App = () => {
   }
 
   return (
-    <div style={styles.container}>
+    <div  style={styles.container}>
       <h2>Amplify Todos</h2>
       <input
         onChange={event => setInput('name', event.target.value)}
@@ -89,4 +83,4 @@ const styles = {
   button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
 }
 
-export default withAuthenticator(App)
+export default APIcomponent
