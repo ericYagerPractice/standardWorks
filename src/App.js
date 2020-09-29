@@ -10,7 +10,7 @@ import { withAuthenticator } from '@aws-amplify/ui-react'
 
 Amplify.configure(awsExports);
 
-const initialState = { name: '', description: '' }
+const initialState = { name: '', description: '', anotherOne: '' }
 
 const App = () => {
   const [formState, setFormState] = useState(initialState)
@@ -34,7 +34,7 @@ const App = () => {
 
   async function addTodo() {
     try {
-      if (!formState.name || !formState.description) return
+      if (!formState.name || !formState.description || !formState.anotherOne) return
       const todo = { ...formState }
       setTodos([...todos, todo])
       setFormState(initialState)
@@ -59,12 +59,19 @@ const App = () => {
         value={formState.description}
         placeholder="Description"
       />
+      <input
+        onChange={event => setInput('anotherOne', event.target.value)}
+        style={styles.input}
+        value={formState.anotherOne}
+        placeholder="anotherOne"
+      />
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
       {
         todos.map((todo, index) => (
           <div key={todo.id ? todo.id : index} style={styles.todo}>
             <p style={styles.todoName}>{todo.name}</p>
             <p style={styles.todoDescription}>{todo.description}</p>
+            <p style={styles.anotherOne}>{todo.anotherOne}</p>
           </div>
         ))
       }
@@ -78,6 +85,7 @@ const styles = {
   input: { border: 'none', backgroundColor: '#ddd', marginBottom: 10, padding: 8, fontSize: 18 },
   todoName: { fontSize: 20, fontWeight: 'bold' },
   todoDescription: { marginBottom: 0 },
+  todoanotherOne: {marginBottom: 0},
   button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
 }
 
