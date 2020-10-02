@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { API, graphqlOperation } from 'aws-amplify';
-//import {createAviationEdge } from '../../graphql/mutations';
-import { listAviationEdges } from '../../graphql/queries';
+import React, { useState } from 'react';
 import Table from 'react-bootstrap/Table'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -13,67 +10,98 @@ const initialState = { ACiataCode: '', ACicaoCode: '', ACtaileNumbe: '', ARicaoC
 function GetAPIData() {
     const [formState, setFormState] = useState(initialState)
     const [ae, setAviationEdge] = useState([])
+    const [as, setAviationStack] = useState([])
     const aviationItems={};
-    useEffect(() => {
-        fetchAviationEdge()
-      }, []) 
+    const aviationStackItems={};
 
     function setInput(key, value) {
         setFormState({ ...formState, [key]: value })
       }
       
-    async function fetchAviationEdge() {
-        try {
-            const aeData = await API.graphql(graphqlOperation(listAviationEdges))
-            const ae = aeData.data.listAviationEdges.items
-            setAviationEdge(ae)
-        } catch (err) { console.log('error fetching Aviation Edge API items') }
-    } 
-
     async function getAviationEdge() {
         try {
             const icao = { ...formState }.icao
             const apiUrl = "https://aviation-edge.com/v2/public/flights?key=af2520-847137&depIcao="+icao;
             fetch(apiUrl)
                 .then(response=>response.json())
-                .then(response=>parseAviationEdge(response))
+                .then(response=>parseAviationEdge(response[0]))
         } catch (err) {
-          console.log('error creating todo:', err)
+          console.log('error with Aviation Edge', err)
+        }
+    }
+
+    async function getAviationStack(){
+        try{
+            fetch("https://api.aviationstack.com/v1/flights?access_key=c3f460aaf5bba37375304396f48ae826&dep_icao="+{ ...formState }.icao+"&limit=10")
+                .then(response=>response.json())
+                .then(response=>parseOpenSky(response.data[1]))
+        } catch(err){
+            console.log('error with open sky: ', err)
+        }
+    }
+
+    function parseOpenSky(data){
+        try{
+            aviationStackItems.gauge = data.aircraft;
+
+            var airlineData = data.airline;
+            aviationStackItems.airline = airlineData.name;
+
+            var arrivalData = data.arrival;
+            aviationStackItems.arrivalAirport = arrivalData.airport;
+            aviationStackItems.arrivalICAO = arrivalData.icao;
+            aviationStackItems.arrivalGate = arrivalData.gate;
+            aviationStackItems.estimatedArrival = arrivalData.estimated;
+
+            var departureData = data.departure;
+            aviationStackItems.departureAirport = departureData.airport;
+            aviationStackItems.departureTime = departureData.actual;
+            aviationStackItems.departureDelay = departureData.delay;
+            aviationStackItems.departureICAO = departureData.icao;
+            
+            var flightData = data.flight;
+            aviationStackItems.flightNumber = flightData.number;
+            aviationStackItems.flightDate = flightData.flight_date;
+            aviationStackItems.flightStatus = flightData.flight_status;
+
+            setAviationStack([{"blockData": aviationStackItems}]);
+        }catch(err){
+            console.log('error with Open Sky parse: ', err)
         }
     }
 
     function parseAviationEdge(data){
         try{
-            var aircraftData = data[0].aircraft;
+            var aircraftData = data.aircraft;
             aviationItems.arIATA = aircraftData.iataCode;
             aviationItems.arICAO = aircraftData.icaoCode;
             aviationItems.arTailNum = aircraftData.regNumber;
 
-            var arrivalData = data[0].arrival;
+            var arrivalData = data.arrival;
             aviationItems.arrivalICAO = arrivalData.icaoCode;
 
-            var departureData = data[0].departure;
+            var departureData = data.departure;
             aviationItems.departureICAO = departureData.icaoCode;            
 
-            var flightData = data[0].flight;
+            var flightData = data.flight;
             aviationItems.flightNumber = flightData.number;                      
 
-            var geographyData = data[0].geography;
+            var geographyData = data.geography;
             aviationItems.currentFlightAltitude = geographyData.altitude;
             aviationItems.currentFlightDirection = geographyData.direction;
             aviationItems.currentFlightLatitude = geographyData.latitude;
             aviationItems.currentFlightLongitude = geographyData.longitude;  
             
-            var speedData = data[0].speed;
+            var speedData = data.speed;
             aviationItems.currentFlightSpeed = speedData.horizontal;            
 
-            var statusData = data[0].status;
+            var statusData = data.status;
             aviationItems.flightStatus = statusData;            
 
-            var updateData = data[0].system.updated;
+            var updateData = data.system.updated;
             aviationItems.updateTime = updateData;
-            setAviationEdge([...ae, {"blockData": aviationItems}]);
-            
+            setAviationEdge([{"blockData": aviationItems}]);
+          
 
         } catch(err){
             console.log(err);
@@ -97,6 +125,11 @@ function GetAPIData() {
                 var t1 = performance.now();
                 console.log("Aviation Edge: ");
                 console.log(t1-t0);
+                var t2 = performance.now();
+                getAviationStack()
+                var t3 = performance.now();
+                console.log("Aviation Stack: ");
+                console.log(t3-t2);
                 }}>Return Results</button>
         </div>
         <hr />
@@ -175,7 +208,75 @@ function GetAPIData() {
                         }
                     </Col>
                     <Col>
-                        <h6>Flight Aware API</h6>
+                    <h6>Aviation Stack API</h6>
+                        {
+                        as.map((item, index) => (
+                            <div key={item.id ? item.id : index} style={styles.todo}>
+                                <Table responsive striped bordered hover variant="dark">
+                                    <thead>
+                                        <tr>
+                                        <th>Data Type</th>
+                                        <th>Data Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Aircraft Gauge</td>
+                                            <td>{item.blockData.gauge}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Airline Name</td>
+                                            <td>{item.blockData.airline}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Arrival Airport</td>
+                                            <td>{item.blockData.arrivalAirport}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Arrival ICAO</td>
+                                            <td>{item.blockData.arrivalICAO}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Arrival Gate</td>
+                                            <td>{item.blockData.arrivalGate}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Estimated Arrival Time</td>
+                                            <td>{item.blockData.estimatedArrival}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Deoarture Airport</td>
+                                            <td>{item.blockData.departureAirport}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Departure ICAO</td>
+                                            <td>{item.blockData.departureICAO}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Departure Time</td>
+                                            <td>{item.blockData.departureTime}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Departure Delay (min)</td>
+                                            <td>{item.blockData.departureDelay}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Flight Number</td>
+                                            <td>{item.blockData.flightNumber}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Flight Date</td>
+                                            <td>{item.blockData.flightDate}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Flight Status</td>
+                                            <td>{item.blockData.flightStatus}</td>
+                                        </tr>
+                                    </tbody>   
+                                </Table>
+                            </div>
+                        ))
+                        }
                     </Col>
                 </Row>
             </Container>
