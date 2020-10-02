@@ -1,4 +1,9 @@
 {
     "Version": 5,
-    "ElasticsearchWarning": true
+    "ElasticsearchWarning": true,
+    "StackMapping": {
+        "SubscriptiononCreateAviationEdgeResolver": "aviationEdge",
+        "SubscriptiononUpdateAviationEdgeResolver": "aviationEdge",
+        "SubscriptiononDeleteAviationEdgeResolver": "aviationEdge"
+    }
 }

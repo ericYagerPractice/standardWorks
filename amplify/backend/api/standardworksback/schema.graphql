@@ -1,6 +1,23 @@
-type Todo @model {
+type Todo @model @auth(rules: [{allow: owner, operations: [create, update, delete, read] }]) {
   id: ID!
   name: String!
   description: String
   anotherOne: String
+}
+
+type aviationEdge @model @auth(rules: [{allow: owner, operations: [create, update, delete, read] }]) {
+  id: ID!
+  ACiataCode: String
+  ACicaoCode: String
+  ACtaileNumbe: String
+  ARicaoCode: String
+  DEPicaoCode: String
+  FlightNumber: String
+  FlightAltitude: Int
+  FlightDirection: Int
+  FlightLatitude: Float
+  FlightLongitude: Float 
+  FlightSpeed: Int 
+  FlightStatus: String 
+  UpdateTime: Int 
 }

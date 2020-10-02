@@ -1,8 +1,8 @@
 /* src/App.js */
 import React, { useEffect, useState } from 'react';
 import { API, graphqlOperation } from 'aws-amplify';
-import { createTodo } from '../graphql/mutations';
-import { listTodos } from '../graphql/queries';
+import { createTodo } from '../../graphql/mutations';
+import { listTodos } from '../../graphql/queries';
 
 const initialState = { name: '', description: '', anotherOne: '' }
 
