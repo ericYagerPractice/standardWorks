@@ -34,7 +34,7 @@ function GetAPIData() {
         try{
             fetch("https://api.aviationstack.com/v1/flights?access_key=c3f460aaf5bba37375304396f48ae826&dep_icao="+{ ...formState }.icao+"&limit=10")
                 .then(response=>response.json())
-                .then(response=>parseOpenSky(response.data[1]))
+                .then(response=>parseOpenSky(response.data[0]))
         } catch(err){
             console.log('error with open sky: ', err)
         }
@@ -42,6 +42,8 @@ function GetAPIData() {
 
     function parseOpenSky(data){
         try{
+            console.log("Open Sky API response (for one aircraft): ");
+            console.log(data);
             aviationStackItems.gauge = data.aircraft;
 
             var airlineData = data.airline;
@@ -72,6 +74,8 @@ function GetAPIData() {
 
     function parseAviationEdge(data){
         try{
+            console.log("Aviation Edge API response (for one aircraft): ");
+            console.log(data);
             var aircraftData = data.aircraft;
             aviationItems.arIATA = aircraftData.iataCode;
             aviationItems.arICAO = aircraftData.icaoCode;
@@ -113,6 +117,7 @@ function GetAPIData() {
   return(
       <div>
         <div style={styles.container}>
+            <h6>See console log for API response and latency</h6>
             <input
                 onChange={event => setInput('icao', event.target.value)}
                 style={styles.input}
@@ -120,10 +125,11 @@ function GetAPIData() {
                 placeholder="ICAO"
             />
             <button tyoe="submit" onClick={function(){
+                console.log("Aviation Edge: ");
                 var t0 = performance.now();
                 getAviationEdge();
                 var t1 = performance.now();
-                console.log("Aviation Edge: ");
+                console.log("Latency: ");
                 console.log(t1-t0);
                 var t2 = performance.now();
                 getAviationStack()
