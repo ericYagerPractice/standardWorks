@@ -8,10 +8,10 @@ function Routes() {
   return (
     <Switch>
         <Route exact path="/">
-          <Home />
+          <GetAPIData />
         </Route>
         <Route exact path="/APIcomponent">
-          <APIcomponent />
+          <GetAPIData />
         </Route>
         <Route exact path="/FlightTester">
           <GetAPIData />
