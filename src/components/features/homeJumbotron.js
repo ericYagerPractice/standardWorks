@@ -1,15 +1,19 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Jumbotron from 'react-bootstrap/Jumbotron'
+import './style/home.scss';
+import c2djumbo from './staticfiles/c2djumbo.png'
+
+
 
 function Jumbo() {
     return (
         <Jumbotron fluid>
-            <h1>Hello, world!</h1>
-            <p>
-                This is a simple hero unit, a simple jumbotron-style component for calling
-                extra attention to featured content or information.
-            </p>
+            <img
+                src={c2djumbo}
+                alt="Couch to Developer Jumbotron"
+                style={{width:'45%', height:'auto',}}
+            />
         </Jumbotron>
     );
   }

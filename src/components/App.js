@@ -2,7 +2,6 @@
 import React from 'react';
 import Amplify from 'aws-amplify';
 import awsExports from "../aws-exports";
-import { withAuthenticator} from '@aws-amplify/ui-react';
 import Header from './features/header'
 
 
@@ -16,4 +15,4 @@ const App = () => {
   )
 }
 
-export default withAuthenticator(App)
+export default App

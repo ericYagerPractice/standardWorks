@@ -3,6 +3,7 @@ import Table from 'react-bootstrap/Table'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
+import { withAuthenticator} from '@aws-amplify/ui-react';
 
 
 const initialState = { ACiataCode: '', ACicaoCode: '', ACtaileNumbe: '', ARicaoCode: '', DEPicaoCode: '', FlightNumber: '', FlightAltitude: 0, FlightDirection: 0, FlightLatitude: 0.0, FlightLongitude: 0.0, FlightSpeed: '', FlightStatus: '', UpdateTime: 0}
@@ -302,4 +303,4 @@ const styles = {
     button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
   }
   
-export default GetAPIData;
+export default withAuthenticator(GetAPIData);
